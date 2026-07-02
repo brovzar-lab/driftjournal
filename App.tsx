@@ -5,6 +5,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { useStore } from './src/lib/store';
+import { initializePurchases, checkIsPremium } from './src/lib/revenueCat';
 
 function ToastOverlay() {
   const toastMessage = useStore((s) => s.toastMessage);
@@ -26,6 +27,15 @@ function ToastOverlay() {
 }
 
 export default function App() {
+  const setIsPremium = useStore((s) => s.setIsPremium);
+
+  useEffect(() => {
+    initializePurchases();
+    checkIsPremium().then((premium) => {
+      if (premium) setIsPremium(true);
+    });
+  }, [setIsPremium]);
+
   return (
     <SafeAreaProvider>
       <NavigationContainer>

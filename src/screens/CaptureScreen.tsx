@@ -11,9 +11,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { useStore } from '../lib/store';
 import { isDemoMode } from '../lib/demo';
+import {
+  requestMicPermission,
+  startRecording as startAudioRecording,
+  stopRecording as stopAudioRecording,
+} from '../lib/audio';
 
 const BAR_COUNT = 24;
 const MAX_DURATION = 60;
+const FREE_DAILY_LIMIT = 10;
 
 function Waveform({ isRecording }: { isRecording: boolean }) {
   const anims = useRef(
@@ -87,12 +93,17 @@ const waveStyles = StyleSheet.create({
 export default function CaptureScreen() {
   const navigation = useNavigation();
   const incrementCapture = useStore((s) => s.incrementCapture);
+  const dailyCaptureCount = useStore((s) => s.dailyCaptureCount);
+  const isPremium = useStore((s) => s.isPremium);
   const showToast = useStore((s) => s.showToast);
 
   const [isRecording, setIsRecording] = useState(false);
   const [hasRecording, setHasRecording] = useState(false);
   const [elapsed, setElapsed] = useState(0);
+  const [audioUri, setAudioUri] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const atLimit = !isPremium && dailyCaptureCount >= FREE_DAILY_LIMIT;
 
   useEffect(() => {
     return () => {
@@ -100,9 +111,24 @@ export default function CaptureScreen() {
     };
   }, []);
 
-  function startRecording() {
+  async function startRecording() {
+    if (atLimit && !isDemoMode) {
+      showToast('Daily limit reached — upgrade to Premium for unlimited captures');
+      return;
+    }
+
+    const granted = await requestMicPermission();
+    if (!granted) {
+      showToast('Microphone permission required to record');
+      return;
+    }
+
     setIsRecording(true);
     setElapsed(0);
+    setAudioUri(null);
+
+    await startAudioRecording();
+
     intervalRef.current = setInterval(() => {
       setElapsed((e) => {
         if (e >= MAX_DURATION - 1) {
@@ -114,8 +140,10 @@ export default function CaptureScreen() {
     }, 1000);
   }
 
-  function stopRecording() {
+  async function stopRecording() {
     if (intervalRef.current) clearInterval(intervalRef.current);
+    const uri = await stopAudioRecording();
+    setAudioUri(uri);
     setIsRecording(false);
     setHasRecording(true);
   }

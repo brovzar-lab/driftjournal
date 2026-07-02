@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { DemoBanner } from '../components/DemoBanner';
+import PaywallModal from '../components/PaywallModal';
 import { isDemoMode } from '../lib/demo';
 import { useStore } from '../lib/store';
 import { demoClusters } from '../lib/mockData';
@@ -10,13 +11,18 @@ const FREE_DAILY_LIMIT = 10;
 
 export default function SettingsScreen() {
   const dailyCaptureCount = useStore((s) => s.dailyCaptureCount);
+  const isPremium = useStore((s) => s.isPremium);
   const showToast = useStore((s) => s.showToast);
   const totalThoughts = demoClusters.reduce((sum, c) => sum + c.thoughts.length, 0);
+
+  const [paywallVisible, setPaywallVisible] = useState(false);
 
   function handleUpgrade() {
     if (isDemoMode) {
       showToast('Demo mode — upgrade flow not available');
+      return;
     }
+    setPaywallVisible(true);
   }
 
   const usedPct = Math.min(dailyCaptureCount / FREE_DAILY_LIMIT, 1);
@@ -25,6 +31,7 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       {isDemoMode && <DemoBanner />}
+      <PaywallModal visible={paywallVisible} onClose={() => setPaywallVisible(false)} />
 
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.premiumCard}>
@@ -40,14 +47,21 @@ export default function SettingsScreen() {
             <Text style={styles.featureFree}>✓  AI theme clustering — always free</Text>
             <Text style={styles.featureFree}>✓  Daily resurface engine — always free</Text>
           </View>
-          <TouchableOpacity
-            style={styles.upgradeButton}
-            onPress={handleUpgrade}
-            accessibilityRole="button"
-            accessibilityLabel="Upgrade to Premium"
-          >
-            <Text style={styles.upgradeButtonText}>Upgrade to Premium</Text>
-          </TouchableOpacity>
+          {!isPremium && (
+            <TouchableOpacity
+              style={styles.upgradeButton}
+              onPress={handleUpgrade}
+              accessibilityRole="button"
+              accessibilityLabel="Upgrade to Premium"
+            >
+              <Text style={styles.upgradeButtonText}>Upgrade to Premium</Text>
+            </TouchableOpacity>
+          )}
+          {isPremium && (
+            <View style={[styles.upgradeButton, styles.premiumActive]}>
+              <Text style={styles.upgradeButtonText}>✓ Premium Active</Text>
+            </View>
+          )}
         </View>
 
         <View style={styles.section}>
@@ -150,6 +164,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
     minHeight: 48,
   },
+  premiumActive: { backgroundColor: '#166534' },
   upgradeButtonText: { color: '#fff', fontSize: 15, fontWeight: '700' },
 
   section: { gap: 12 },

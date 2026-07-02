@@ -1,19 +1,31 @@
 {
   "cli": {
-    "version": ">= 10.0.0"
+    "version": ">= 10.0.0",
+    "requireCommit": true
   },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      }
     },
     "preview": {
       "distribution": "internal",
+      "ios": {
+        "resourceClass": "m-medium"
+      },
       "android": {
         "buildType": "apk"
       }
     },
     "production": {
+      "distribution": "store",
+      "ios": {
+        "resourceClass": "m-medium",
+        "autoIncrement": true
+      },
       "android": {
         "buildType": "app-bundle",
         "autoIncrement": true
@@ -22,6 +34,11 @@
   },
   "submit": {
     "production": {
+      "ios": {
+        "appleId": "REPLACE_WITH_APPLE_ID",
+        "ascAppId": "REPLACE_WITH_APP_STORE_CONNECT_APP_ID",
+        "appleTeamId": "REPLACE_WITH_APPLE_TEAM_ID"
+      },
       "android": {
         "serviceAccountKeyPath": "./play-store-service-account.json",
         "track": "internal",

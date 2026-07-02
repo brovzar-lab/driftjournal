@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -100,7 +100,7 @@ export default function CaptureScreen() {
   const [isRecording, setIsRecording] = useState(false);
   const [hasRecording, setHasRecording] = useState(false);
   const [elapsed, setElapsed] = useState(0);
-  const [audioUri, setAudioUri] = useState<string | null>(null);
+  const [_audioUri, setAudioUri] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const atLimit = !isPremium && dailyCaptureCount >= FREE_DAILY_LIMIT;

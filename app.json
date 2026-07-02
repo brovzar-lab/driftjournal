@@ -37,8 +37,7 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-av",
-      "react-native-purchases"
+      "expo-av"
     ],
     "experiments": {
       "typedRoutes": false

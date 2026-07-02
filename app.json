@@ -27,17 +27,33 @@
         "backgroundColor": "#0f0e17"
       },
       "package": "com.lemaa.driftjournal",
+      "versionCode": 1,
+      "minSdkVersion": 26,
+      "targetSdkVersion": 35,
+      "compileSdkVersion": 35,
       "googleServicesFile": "./google-services.json",
       "permissions": [
         "android.permission.RECORD_AUDIO",
-        "android.permission.INTERNET"
+        "android.permission.INTERNET",
+        "android.permission.VIBRATE"
       ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-av"
+      [
+        "expo-av",
+        {
+          "microphonePermission": "DriftJournal uses the microphone to capture your voice thoughts."
+        }
+      ],
+      [
+        "react-native-purchases",
+        {
+          "androidInAppPurchasesEnabled": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": false

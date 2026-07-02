@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -6,9 +6,10 @@ import {
   StyleSheet,
   Animated,
   ScrollView,
+  BackHandler,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useStore } from '../lib/store';
 import { isDemoMode } from '../lib/demo';
 import {
@@ -111,6 +112,19 @@ export default function CaptureScreen() {
     };
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+        if (isRecording) {
+          stopRecording();
+          return true;
+        }
+        return false;
+      });
+      return () => subscription.remove();
+    }, [isRecording]),
+  );
+
   async function startRecording() {
     if (atLimit && !isDemoMode) {
       showToast('Daily limit reached — upgrade to Premium for unlimited captures');
@@ -186,7 +200,7 @@ export default function CaptureScreen() {
               accessibilityLabel="Start recording"
             >
               <Text style={styles.recordEmoji}>🎙️</Text>
-              <Text style={styles.recordLabel}>Hold to Record</Text>
+              <Text style={styles.recordLabel}>Tap to Record</Text>
             </TouchableOpacity>
           )}
 

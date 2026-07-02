@@ -15,6 +15,8 @@ export async function startRecording(): Promise<void> {
   await Audio.setAudioModeAsync({
     allowsRecordingIOS: true,
     playsInSilentModeIOS: true,
+    shouldDuckAndroid: true,
+    playThroughEarpieceAndroid: false,
   });
 
   const { recording } = await Audio.Recording.createAsync(
@@ -27,12 +29,14 @@ export async function stopRecording(): Promise<string | null> {
   if (isDemoMode || !activeRecording) return null;
 
   await activeRecording.stopAndUnloadAsync();
-  await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+  await Audio.setAudioModeAsync({
+    allowsRecordingIOS: false,
+    shouldDuckAndroid: false,
+  });
 
   const uri = activeRecording.getURI() ?? null;
   activeRecording = null;
-  return uri;
-}
+  return uri;}
 
 export function isRecordingActive(): boolean {
   return activeRecording !== null;

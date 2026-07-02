@@ -1,4 +1,5 @@
 import { Text } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/HomeScreen';
@@ -27,13 +28,19 @@ function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
 }
 
 function MainTabs() {
+  const insets = useSafeAreaInsets();
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: true,
         tabBarActiveTintColor: '#6d28d9',
         tabBarInactiveTintColor: '#9ca3af',
-        tabBarStyle: { paddingBottom: 4, borderTopColor: '#f3f4f6' },
+        tabBarStyle: {
+          paddingBottom: (insets.bottom || 4),
+          height: 52 + (insets.bottom || 4),
+          borderTopColor: '#1f2937',
+          backgroundColor: '#0f0e17',
+        },
         headerStyle: { backgroundColor: '#fafafa' },
         headerTitleStyle: { color: '#1f2937', fontWeight: '700' },
       }}
